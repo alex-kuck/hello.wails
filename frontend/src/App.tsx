@@ -1,28 +1,44 @@
-import {useState} from 'react';
-import logo from './assets/images/logo-universal.png';
+import {PropsWithChildren, useEffect, useState} from 'react';
 import './App.css';
-import {Greet} from "../wailsjs/go/main/App";
+import {GetPlanets} from "../wailsjs/go/main/App";
+import {sw} from "../wailsjs/go/models";
+import {BrowserOpenURL} from "../wailsjs/runtime";
 
 function App() {
-    const [resultText, setResultText] = useState("Please enter your name below 👇");
-    const [name, setName] = useState('');
-    const updateName = (e: any) => setName(e.target.value);
-    const updateResultText = (result: string) => setResultText(result);
+    const [planets, setPlanets] = useState<sw.Planet[]>([])
 
-    function greet() {
-        Greet(name).then(updateResultText);
-    }
+    useEffect(() => {
+        GetPlanets().then(setPlanets).catch(e => console.error(e));
+    }, [])
 
     return (
         <div id="App">
-            <img src={logo} id="logo" alt="logo"/>
-            <div id="result" className="result">{resultText}</div>
-            <div id="input" className="input-box">
-                <input id="name" className="input" onChange={updateName} autoComplete="off" name="input" type="text"/>
-                <button className="btn" onClick={greet}>Greet</button>
-            </div>
+            <span>Currently I know about {planets.length} planet(s).</span>
+            <Planets planets={planets}/>
         </div>
     )
+}
+
+type PlanetsProps = { planets: sw.Planet[] };
+
+function Planets({planets}: PropsWithChildren<PlanetsProps>) {
+    return <div>
+        <h1>Planets</h1>
+        {planets.map(p => <Planet key={p.url} planet={p}/>)}
+    </div>;
+}
+
+interface PlanetProps {
+    planet: sw.Planet
+}
+
+function Planet({planet}: PlanetProps) {
+    return <div>
+        <h2>{planet.name}</h2>
+        <span>Climate: {planet.climate}</span><br/>
+        <span>Rotation-Period: {planet.rotation_period}</span><br/>
+        <a href="#" onClick={() => BrowserOpenURL(planet.url)} target="#blank">Open in Browser</a>
+    </div>
 }
 
 export default App

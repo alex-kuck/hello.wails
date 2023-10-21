@@ -24,3 +24,7 @@ body {
     height: 100vh;
     text-align: center;
 }
+
+a {
+    color: beige;
+}
