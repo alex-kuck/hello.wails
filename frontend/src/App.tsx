@@ -22,10 +22,14 @@ function App() {
 type PlanetsProps = { planets: sw.Planet[] };
 
 function Planets({planets}: PropsWithChildren<PlanetsProps>) {
-    return <div>
-        <h1>Planets</h1>
-        {planets.map(p => <Planet key={p.url} planet={p}/>)}
-    </div>;
+    return (
+        <div>
+            <h1>Planets</h1>
+            <div id="planets">
+                {planets.map(p => <Planet key={p.url} planet={p}/>)}
+            </div>
+        </div>
+    );
 }
 
 interface PlanetProps {
