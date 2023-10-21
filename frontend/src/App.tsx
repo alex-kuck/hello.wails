@@ -1,19 +1,28 @@
-import {PropsWithChildren, useEffect, useState} from 'react';
+import {useState} from 'react';
 import './App.css';
 import {GetPlanets} from "../wailsjs/go/main/App";
 import {sw} from "../wailsjs/go/models";
 import {BrowserOpenURL} from "../wailsjs/runtime";
 
+type AppState = 'idle' | 'fetching'
+
 function App() {
+    const [state, setState] = useState<AppState>('idle')
     const [planets, setPlanets] = useState<sw.Planet[]>([])
 
-    useEffect(() => {
-        GetPlanets().then(setPlanets).catch(e => console.error(e));
-    }, [])
+    const fetchPlanets = () => {
+        setState('fetching')
+        GetPlanets()
+            .then(setPlanets)
+            .catch(e => console.error(e))
+            .finally(() => setState('idle'));
+    };
 
     return (
         <div id="App">
-            <span>Currently I know about {planets.length} planet(s).</span>
+            <span>Currently I know about {planets.length} planet(s).</span><br/>
+            <button onClick={fetchPlanets}
+                    disabled={state === 'fetching'}>{state === 'idle' ? 'Load Planets' : 'Loading'}</button>
             <Planets planets={planets}/>
         </div>
     )
@@ -21,7 +30,11 @@ function App() {
 
 type PlanetsProps = { planets: sw.Planet[] };
 
-function Planets({planets}: PropsWithChildren<PlanetsProps>) {
+function Planets({planets}: PlanetsProps) {
+    if (planets.length === 0) {
+        return null;
+    }
+
     return (
         <div>
             <h1>Planets</h1>
