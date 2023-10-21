@@ -1,4 +1,4 @@
-module changeme
+module github.com/alex-kuck/hello.wails
 
 go 1.18
 
